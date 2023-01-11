@@ -10,20 +10,23 @@ import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+
+import java.util.Map;
 import java.util.Optional;
 
 
 public class BotMain extends TelegramLongPollingBot {
 
+    private static final Map<String, String> getenv = System.getenv();
 
     @Override
     public String getBotUsername() {
-        return "@DanyaWeatherJava_bot";
+        return getenv.get("BOT_NAME");
     }
 
     @Override
     public String getBotToken() {
-        return "5902731988:AAH9PkvX66O3ICWdC3vVWymXpEip9JciLs4";
+        return getenv.get("BOT_TOKEN");
     }
 
 
@@ -32,8 +35,8 @@ public class BotMain extends TelegramLongPollingBot {
         if (update.hasMessage()) {
             Message message = update.getMessage();
             try {
-                if (message.hasText() && message.hasEntities()){
-                        commandHandle(message);
+                if (message.hasText() && message.hasEntities()) {
+                    commandHandle(message);
                 } else if (message.hasText()) {
                     textMessageHandle(message);
                 }
@@ -47,7 +50,7 @@ public class BotMain extends TelegramLongPollingBot {
     private void commandHandle(Message message) throws TelegramApiException {
         Optional<MessageEntity> commandEntity =
                 message.getEntities().stream().filter(e -> "bot_command".equals(e.getType())).findFirst();
-        if (commandEntity.isPresent()){
+        if (commandEntity.isPresent()) {
             String command =
                     message.getText().substring(commandEntity.get().getOffset(), commandEntity.get().getLength());
             if ("/start".equals(command)) {
@@ -58,9 +61,9 @@ public class BotMain extends TelegramLongPollingBot {
         }
     }
 
-    private void textMessageHandle(Message message){
+    private void textMessageHandle(Message message) {
         UserResource userResource = new UserResource(message.getChatId().toString(), message.getText());
-        Runnable weatherData = new GetWeather(userResource, new DefaultBotOptions());
+        Runnable weatherData = new GetWeather(userResource, new DefaultBotOptions(), getenv.get("BOT_TOKEN"));
         weatherData.run();
     }
 

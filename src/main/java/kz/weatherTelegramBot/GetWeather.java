@@ -19,15 +19,17 @@ import java.net.URL;
 public class GetWeather extends DefaultAbsSender implements Runnable {
 
     private final UserResource userResource;
+    private final String token;
 
-    protected GetWeather(UserResource userResource, DefaultBotOptions options) {
+    protected GetWeather(UserResource userResource, DefaultBotOptions options, String token) {
         super(options);
         this.userResource = userResource;
+        this.token = token;
     }
 
     @Override
     public String getBotToken() {
-        return "5902731988:AAH9PkvX66O3ICWdC3vVWymXpEip9JciLs4";
+        return token;
     }
 
     @Override
